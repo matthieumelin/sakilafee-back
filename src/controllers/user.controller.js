@@ -47,6 +47,25 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.forgot = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      message: "Le champ e-mail n'est pas remplis correctement.",
+    });
+  }
+
+  const user = await User.findOne({ where: { email: email } });
+
+  if (user) {
+  }
+
+  return res.status(200).json({
+    message: "Un e-mail vient de vous être envoyé.",
+  });
+};
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
