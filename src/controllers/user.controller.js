@@ -50,6 +50,10 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.verify = async (req, res) => {
+  const { email } = req.body;
+}
+
 exports.forgot = async (req, res) => {
   const { email } = req.body;
 

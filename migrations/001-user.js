@@ -68,6 +68,9 @@ module.exports = {
         allowNull: false,
         unique: false,
       },
+      isVerified: {
+        type: Sequelize.BOOLEAN
+      },
       // accessToken: {
       //   type: Sequelize.TEXT,
       //   allowNull: true,
