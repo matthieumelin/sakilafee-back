@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const { createJwt } = require("../utils/jwt.util");
 const { encrypt, compare } = require("../utils/bcrypt.util");
+const { sendMail } = require("../utils/mail/mail.util");
 
 exports.register = async (req, res) => {
   try {
@@ -22,6 +23,8 @@ exports.register = async (req, res) => {
 
     const encryptedPassword = await encrypt(password);
     const data = {
+      firstName: firstName,
+      lastName: lastName,
       email: email,
       password: encryptedPassword,
     };
@@ -59,10 +62,19 @@ exports.forgot = async (req, res) => {
   const user = await User.findOne({ where: { email: email } });
 
   if (user) {
+    await sendMail({
+      from: "matthieumelindev@gmail.com",
+      to: email,
+      subject: "Saki Lafée - Réinitialisation du mot de passe",
+      template: "forgot",
+      context: {
+        link: "templink",
+      },
+    });
   }
 
   return res.status(200).json({
-    message: "Un e-mail vient de vous être envoyé.",
+    message: "Un e-mail vient d'être envoyé sur l'adresse renseignée.",
   });
 };
 
@@ -94,17 +106,16 @@ exports.login = async (req, res) => {
 
     const token = await createJwt(user);
 
-    const tokenData = {
-      accessToken: token.token,
-      accessTokenExpires: token.expirationDate,
-    };
-
-    await user.update(tokenData);
+    const data = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      token: token,
+    }
 
     return res.status(200).json({
       message: "Vous êtes désormais connecté.",
-      accessToken: tokenData.accessToken,
-      accessTokenExpires: tokenData.accessTokenExpires,
+      data: data
     });
   } catch (error) {
     console.error("An error occurred while logged a user: ", error);

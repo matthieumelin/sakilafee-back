@@ -3,17 +3,12 @@ const apiConfig = require('../../config/config.json').development;
 
 exports.createJwt = async (data) => {
     try {
-        const hours = 12;
-        const expirationDate = new Date(Date.now()).getTime() + (((1000 * 60) * 60) * hours);
-
-        data.expirationDate = expirationDate;
-
         const token = await jwt.sign({
             data
-        }, apiConfig.secretKey, { expiresIn: `${hours}h` });
+        }, apiConfig.secretKey, { expiresIn: "12h" });
 
         if (token) {
-            return { token: token, expirationDate: expirationDate };
+            return token;
         }
     } catch (error) {
         console.error('Unable to sign new JWToken');

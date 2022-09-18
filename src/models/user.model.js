@@ -79,16 +79,16 @@ User.init(
       unique: false,
       defaultValue: "user"
     },
-    accessToken: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      unique: false,
-    },
-    accessTokenExpires: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      unique: false,
-    },
+    // accessToken: {
+    //   type: DataTypes.TEXT,
+    //   allowNull: true,
+    //   unique: false,
+    // },
+    // accessTokenExpires: {
+    //   type: DataTypes.BIGINT,
+    //   allowNull: true,
+    //   unique: false,
+    // },
   },
   {
     sequelize,
