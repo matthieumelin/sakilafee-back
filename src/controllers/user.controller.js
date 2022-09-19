@@ -1,58 +1,114 @@
 const User = require("../models/user.model");
+const Verification = require("../models/verification.model");
 const { createJwt } = require("../utils/jwt.util");
 const { encrypt, compare } = require("../utils/bcrypt.util");
-const { sendMail } = require("../utils/mail/mail.util");
+const { sendMail } = require("../utils/mail.util");
+const randtoken = require("rand-token");
 
 exports.register = async (req, res) => {
-  try {
-    const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
-    if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({
-        message: "Tous les champs ne sont pas remplis correctement.",
-      });
-    }
-
-    const isExist = await User.findOne({ where: { email: email } });
-
-    if (isExist) {
-      return res.status(400).json({
-        message: "L'utilisateur existe déjà.",
-      });
-    }
-
-    const encryptedPassword = await encrypt(password);
-    const data = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: encryptedPassword,
-    };
-
-    if (data.email && data.password) {
-      const user = await new User(data);
-
-      user.save();
-
-      return res.status(201).json({
-        message: "L'utilisateur a été créé.",
-      });
-    }
-
+  if (!firstName || !lastName || !email || !password) {
     return res.status(400).json({
-      message: "Une erreur est survenue.",
-    });
-  } catch (error) {
-    console.error("An error occurred while creating a user: ", error);
-    return res.status(400).json({
-      message: error,
+      message: "Tous les champs ne sont pas remplis correctement.",
     });
   }
+
+  const user = await User.findOne({ where: { email: email } });
+
+  if (user) {
+    return res.status(400).json({
+      message: "L'utilisateur existe déjà.",
+    });
+  }
+
+  const encryptedPassword = await encrypt(password);
+  const data = {
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    password: encryptedPassword,
+  };
+
+  if (Object.keys(data).length) {
+    const randomToken = randtoken.generate(16);
+
+    await new User(data).save();
+    await new Verification({
+      email: email,
+      token: randomToken,
+    }).save();
+
+    await sendMail({
+      from: "matthieumelindev@gmail.com",
+      to: email,
+      subject: `Saki Lafée - Bienvenue ${firstName}`,
+      template: "verification",
+      context: {
+        firstName: firstName,
+        link: `http://localhost:3030/api/v1/users/verify/${randomToken}`,
+      },
+    });
+
+    return res.status(201).json({
+      message: "L'utilisateur a été créé.",
+    });
+  }
+
+  return res.status(400).json({
+    message: "Une erreur est survenue.",
+  });
 };
 
-exports.verify = async (req, res) => {
-  const { email } = req.body;
-}
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Tous les champs ne sont pas remplis correctement.",
+    });
+  }
+
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) {
+    return res.status(404).json({
+      message: "L'email et/ou le mot de passe est incorrect.",
+    });
+  }
+
+  const isCorrectPassword = await compare(password, user.password);
+
+  if (!isCorrectPassword) {
+    return res.status(400).json({
+      message: "L'email et/ou le mot de passe est incorrect.",
+    });
+  }
+
+  const verification = await Verification.findOne({
+    where: { email: email },
+  });
+
+  if (!verification.verified) {
+    return res.status(401).json({
+      message: "Veuillez vérifier votre compte.",
+    });
+  }
+
+  const token = await createJwt(user);
+
+  const data = {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    token: token,
+  };
+
+  return res.status(200).json({
+    message: "Vous êtes désormais connecté.",
+    data: data,
+  });
+};
 
 exports.forgot = async (req, res) => {
   const { email } = req.body;
@@ -82,49 +138,31 @@ exports.forgot = async (req, res) => {
   });
 };
 
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+exports.verify = async (req, res) => {
+  const { token } = req.params;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        message: "Tous les champs ne sont pas remplis correctement.",
-      });
-    }
-
-    const user = await User.findOne({ where: { email: email } });
-
-    if (!user) {
-      return res.status(404).json({
-        message: "L'email et/ou le mot de passe est incorrect.",
-      });
-    }
-
-    const isCorrectPassword = await compare(password, user.password);
-
-    if (!isCorrectPassword) {
-      return res.status(400).json({
-        message: "L'email et/ou le mot de passe est incorrect.",
-      });
-    }
-
-    const token = await createJwt(user);
-
-    const data = {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      token: token,
-    }
-
-    return res.status(200).json({
-      message: "Vous êtes désormais connecté.",
-      data: data
-    });
-  } catch (error) {
-    console.error("An error occurred while logged a user: ", error);
+  if (!token) {
     return res.status(400).json({
-      message: error,
+      message: "Un token doit être renseigné.",
     });
   }
+
+  const verification = await Verification.findOne({
+    where: { token: token },
+  });
+
+  if (!verification || verification.verified) {
+    return res.status(401).json({
+      message: "Non autorisé.",
+    });
+  }
+
+  verification.verified = true;
+  verification.token = "";
+
+  await verification.save();
+
+  return res.status(200).json({
+    message: "Votre compte est désormais vérifié.",
+  });
 };

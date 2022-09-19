@@ -79,12 +79,6 @@ User.init(
       unique: false,
       defaultValue: "user"
     },
-    verified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      unique: false,
-      defaultValue: false
-    }
     // accessToken: {
     //   type: DataTypes.TEXT,
     //   allowNull: true,

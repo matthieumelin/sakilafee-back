@@ -9,10 +9,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-    res.send("Forum API");
-});
-
 app.use('/api/v1/users', require('./src/routes/user.routes'));
 
 app.listen(3030, async() => {

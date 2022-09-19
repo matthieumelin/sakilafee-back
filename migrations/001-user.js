@@ -61,15 +61,12 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: false,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: false,
-      },
-      isVerified: {
-        type: Sequelize.BOOLEAN
       },
       // accessToken: {
       //   type: Sequelize.TEXT,
