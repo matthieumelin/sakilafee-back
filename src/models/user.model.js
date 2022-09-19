@@ -2,7 +2,7 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../../config/database.config");
 
-class User extends Model {}
+class User extends Model { }
 
 User.init(
   {
@@ -79,16 +79,16 @@ User.init(
       unique: false,
       defaultValue: "user"
     },
-    // accessToken: {
-    //   type: DataTypes.TEXT,
-    //   allowNull: true,
-    //   unique: false,
-    // },
-    // accessTokenExpires: {
-    //   type: DataTypes.BIGINT,
-    //   allowNull: true,
-    //   unique: false,
-    // },
+    accessToken: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      unique: false,
+    },
+    accessTokenExpires: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      unique: false,
+    },
   },
   {
     sequelize,

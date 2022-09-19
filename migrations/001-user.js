@@ -68,19 +68,19 @@ module.exports = {
         allowNull: false,
         unique: false,
       },
-      // accessToken: {
-      //   type: Sequelize.TEXT,
-      //   allowNull: true,
-      //   unique: false,
-      // },
-      // accessTokenExpires: {
-      //   type: Sequelize.BIGINT,
-      //   allowNull: true,
-      //   unique: false,
-      // },
       permission: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: false,
+      },
+      accessToken: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+        unique: false,
+      },
+      accessTokenExpires: {
+        type: Sequelize.BIGINT,
+        allowNull: true,
         unique: false,
       },
       createdAt: {

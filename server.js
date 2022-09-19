@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use('/api/v1/users', require('./src/routes/user.routes'));
+app.use('/api/v1/articles', require('./src/routes/article.routes'));
 
 app.listen(3030, async() => {
     try {

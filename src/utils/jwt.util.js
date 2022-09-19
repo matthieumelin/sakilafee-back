@@ -2,26 +2,20 @@ const jwt = require('jsonwebtoken');
 const apiConfig = require('../../config/config.json').development;
 
 exports.createJwt = async (data) => {
-    try {
-        const token = await jwt.sign({
-            data
-        }, apiConfig.secretKey, { expiresIn: "12h" });
+    const hours = 12;
+    const expirationDate = new Date(Date.now()).getTime() + (((1000 * 60) * 60) * hours);
 
-        if (token) {
-            return token;
-        }
-    } catch (error) {
-        console.error('Unable to sign new JWToken');
+    const token = await jwt.sign({
+        data
+    }, apiConfig.secretKey, { expiresIn: "12h" });
+
+    if (token) {
+        return { token: token, expirationDate: expirationDate };
     }
     return false;
 }
 
 exports.verify = async (token) => {
-    try {
-        const decodedData = await jwt.verify(token, apiConfig.privateKey);
-        return decodedData;
-    } catch (error) {
-        console.error("Unable to verify JWToken.");
-    }
-    return false;
+    const decodedData = await jwt.verify(token, apiConfig.privateKey);
+    return decodedData;
 }

@@ -97,16 +97,15 @@ exports.login = async (req, res) => {
 
   const token = await createJwt(user);
 
-  const data = {
-    id: user.id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    token: token,
-  };
+  await user.update({
+    accessToken: token.token,
+    accessTokenExpires: token.expirationDate
+  });
 
   return res.status(200).json({
     message: "Vous êtes désormais connecté.",
-    data: data,
+    accessToken: token.token,
+    accessTokenExpires: token.expirationDate
   });
 };
 
