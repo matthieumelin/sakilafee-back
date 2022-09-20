@@ -99,13 +99,17 @@ exports.login = async (req, res) => {
 
   await user.update({
     accessToken: token.token,
-    accessTokenExpires: token.expirationDate
+    accessTokenExpires: token.expirationDate,
   });
 
   return res.status(200).json({
     message: "Vous êtes désormais connecté.",
-    accessToken: token.token,
-    accessTokenExpires: token.expirationDate
+    data: {
+      accessToken: token.token,
+      accessTokenExpires: token.expirationDate,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    },
   });
 };
 
