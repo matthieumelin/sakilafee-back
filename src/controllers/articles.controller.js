@@ -1,9 +1,15 @@
 const Article = require("../models/article.model");
+const ArticleCategory = require("../models/article-category.model");
 
-exports.fetch = async (req, res) => {
+exports.findAll = async (req, res) => {
   const articles = await Article.findAll();
   return res.status(200).json(articles);
-}
+};
+
+exports.findAllCategories = async (req, res) => {
+  const articleCategories = await ArticleCategory.findAll();
+  return res.status(200).json(articleCategories);
+};
 
 exports.create = async (req, res) => {
   const { name, description, category, pictures, price, stockMin } = req.body;
@@ -60,10 +66,6 @@ exports.create = async (req, res) => {
   });
 };
 
-exports.update = async (req, res) => {
+exports.update = async (req, res) => {};
 
-}
-
-exports.delete = async (req, res) => {
-
-}
+exports.delete = async (req, res) => {};

@@ -2,7 +2,7 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../../config/database.config");
 
-class Article extends Model { }
+class Article extends Model {}
 
 Article.init(
   {
@@ -41,8 +41,8 @@ Article.init(
     stockMin: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-      unique: false
-    }
+      unique: false,
+    },
   },
   {
     sequelize,
@@ -50,5 +50,4 @@ Article.init(
     tableName: "articles",
   }
 );
-
 module.exports = Article;

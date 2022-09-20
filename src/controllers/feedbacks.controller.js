@@ -1,5 +1,4 @@
 const Feedback = require("../models/feedback.model");
-const apiConfig = require("../../config/config.json").development;
 const jwt = require("../utils/jwt.util");
 
 exports.create = async (req, res) => {
